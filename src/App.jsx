@@ -23,52 +23,47 @@ class IssueFilter extends React.Component {
     }
 }
 
-class IssueRow extends React.Component {
+function IssueRow(props) {
 
-    render() {
+    const issue = props.issue;
 
-        const issue = this.props.issue;
-
-        return (
-            <tr>
-                <td>{issue.id}</td>
-                <td>{issue.owner}</td>
-                <td>{issue.status}</td>
-                <td>{issue.title}</td>
-                <td>{issue.created.toDateString()}</td>
-                <td>{issue.due ? issue.due.toDateString() : ''}</td>
-                <td>{issue.effort}</td></tr>
-        )
-    }
+    return (
+        <tr>
+            <td>{issue.id}</td>
+            <td>{issue.owner}</td>
+            <td>{issue.status}</td>
+            <td>{issue.title}</td>
+            <td>{issue.created.toDateString()}</td>
+            <td>{issue.due ? issue.due.toDateString() : ''}</td>
+            <td>{issue.effort}</td>
+        </tr>
+    );
 }
 
-class IssueTable extends React.Component {
+function IssueTable(props) {
 
-    render() {
+    const issueRows = props.issues.map((issue) => {
+        return <IssueRow key={issue.id} issue={issue}/>;
+    })
 
-        const issueRows = this.props.issues.map((issue) => {
-            return <IssueRow key={issue.id} issue={issue}/>;
-        })
-
-        return (
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Owner</th>
-                        <th>Status</th>
-                        <th>Title</th>
-                        <th>Created</th>
-                        <th>Due</th>
-                        <th>Effort</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {issueRows}
-                </tbody>
-            </table>
-        )
-    }
+    return (
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Owner</th>
+                    <th>Status</th>
+                    <th>Title</th>
+                    <th>Created</th>
+                    <th>Due</th>
+                    <th>Effort</th>
+                </tr>
+            </thead>
+            <tbody>
+            {issueRows}
+            </tbody>
+        </table>
+    )
 }
 
 class IssueAdd extends React.Component {
