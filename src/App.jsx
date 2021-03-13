@@ -1,3 +1,11 @@
+const dateRegex = new RegExp('^\\d\\d\\d\\d-\\d\\d-\\d\\d');
+
+function jsonDateReviver(key, value) {
+    if (dateRegex.test(value)) return new Date(value);
+    return value;
+}
+
+
 class IssueFilter extends React.Component {
 
     render() {
@@ -20,8 +28,8 @@ function IssueRow(props) {
             <td>{issue.owner}</td>
             <td>{issue.status}</td>
             <td>{issue.title}</td>
-            <td>{issue.created/*.toDateString()*/}</td>
-            <td>{issue.due/* ? issue.due.toDateString() : ''*/}</td>
+            <td>{issue.created.toDateString()}</td>
+            <td>{issue.due ? issue.due.toDateString() : ''}</td>
             <td>{issue.effort}</td>
         </tr>
     );
@@ -111,14 +119,16 @@ class IssueList extends React.Component {
             }
         }`;
 
-        const res = await fetch('/api', {
+        let res = await fetch('/api', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({query})
         });
 
-        const issues = (await res.json()).data.issueList;
-        this.setState({issues: issues});
+        const body = await res.text();
+        const result = JSON.parse(body, jsonDateReviver);
+
+        this.setState({issues: result.data.issueList});
     }
 
     render() {

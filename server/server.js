@@ -1,6 +1,7 @@
 const express = require('express');
 const {ApolloServer} = require('apollo-server-express')
 const fs = require('fs')
+const {GraphQLScalarType} = require('graphql')
 
 let aboutMessage = "Astora issue tracker API v1.0";
 
@@ -17,6 +18,15 @@ const issuesDB = [
     },
 ];
 
+const GraphQLDate = new GraphQLScalarType({
+    name: "GraphQLDate",
+    description: "A Date type in GraphQL as a scalar",
+
+    serialize(value) {
+        return value.toISOString();
+    }
+})
+
 const apiResolvers = {
     Query: {
         about: () => aboutMessage,
@@ -27,6 +37,7 @@ const apiResolvers = {
             return aboutMessage = message;
         },
     },
+    GraphQLDate
 };
 
 function issueList() {
