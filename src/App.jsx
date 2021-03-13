@@ -73,7 +73,8 @@ class IssueAdd extends React.Component {
        const form = e.target;
        const issue = {
            title: form.title.value,
-           owner: form.owner.value
+           owner: form.owner.value,
+            due: new Date(new Date().getTime() + 1000*60*60*24*10)
        }
        this.props.createIssue(issue);
        form.reset();
@@ -98,13 +99,26 @@ class IssueList extends React.Component {
         this.state = {issues: []};
     }
 
-    createIssue(issue) {
+    async createIssue(issue) {
 
-        issue.id = this.state.issues.length + 1;
-        issue.created = new Date();
-        const newIssueList = this.state.issues.slice();
-        newIssueList.push(issue);
-        this.setState({issues: newIssueList});
+        const query = `mutation {
+                        issueAdd(issue: {
+                            title: "${issue.title}",
+                                owner: "${issue.owner}",
+                                due: "${issue.due.toISOString()}",
+                        }) {
+                            id
+                        }
+                    }`;
+
+
+
+        const response = await fetch('/api', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify({ query })
+        });
+        this.loadData();
     }
 
     componentDidMount() {
