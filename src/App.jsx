@@ -1,10 +1,13 @@
+// regex of pattern ISOString
 const dateRegex = new RegExp('^\\d\\d\\d\\d-\\d\\d-\\d\\d');
 
+// function that will be passed to JSON.parse, will convert each string date into Date object
 function jsonDateReviver(key, value) {
     if (dateRegex.test(value)) return new Date(value);
     return value;
 }
 
+// wrapper over api fetch, with error handling
 async function graphQLFetch(query, variables = {}) {
     try {
         const response = await fetch('/api', {
@@ -14,6 +17,8 @@ async function graphQLFetch(query, variables = {}) {
         });
         const body = await response.text();
         const result = JSON.parse(body, jsonDateReviver);
+
+        // if errors are encountered show them as alert
         if (result.errors) {
             const error = result.errors[0];
             if (error.extensions.code === 'BAD_USER_INPUT') {
@@ -24,7 +29,9 @@ async function graphQLFetch(query, variables = {}) {
             }
         }
         return result.data;
-    } catch (e) {
+    }
+    // if exception is found, then it must be server error
+    catch (e) {
         alert(`Error in sending data to server: ${e.message}`);
     }
 }
@@ -43,6 +50,7 @@ class IssueFilter extends React.Component {
 
 function IssueRow(props) {
 
+    // issue object passed as props from IssueTable
     const issue = props.issue;
 
     return (
@@ -52,6 +60,7 @@ function IssueRow(props) {
             <td>{issue.status}</td>
             <td>{issue.title}</td>
             <td>{issue.created.toDateString()}</td>
+            {/* if due date is present then convert to string else return empty string */}
             <td>{issue.due ? issue.due.toDateString() : ''}</td>
             <td>{issue.effort}</td>
         </tr>
@@ -60,6 +69,7 @@ function IssueRow(props) {
 
 function IssueTable(props) {
 
+    // issues list passed as props from IssueList, convert into IssueRow
     const issueRows = props.issues.map((issue) => {
         return <IssueRow key={issue.id} issue={issue}/>;
     })
@@ -78,6 +88,7 @@ function IssueTable(props) {
                 </tr>
             </thead>
             <tbody>
+            {/*  array of IssueRow */}
             {issueRows}
             </tbody>
         </table>
@@ -88,6 +99,7 @@ class IssueAdd extends React.Component {
 
    constructor() {
        super();
+       // bind IssueAdd as this to handleSubmit method
        this.handleSubmit = this.handleSubmit.bind(this);
    }
 
@@ -97,8 +109,10 @@ class IssueAdd extends React.Component {
        const issue = {
            title: form.title.value,
            owner: form.owner.value,
+           // due date 10 days after creation date
             due: new Date(new Date().getTime() + 1000*60*60*24*10)
        }
+       // here this === IssueAdd as we used bind on handleSubmit
        this.props.createIssue(issue);
        form.reset();
    }
@@ -122,8 +136,10 @@ class IssueList extends React.Component {
         this.state = {issues: []};
     }
 
+    // add issue to the issuesDB by calling api and then reload the IssueList
     async createIssue(issue) {
 
+        // query to add issue using graphQL variable
         const query = `mutation issueAdd($issue: IssueInputs!) {
                             issueAdd(issue: $issue) {
                                 id
@@ -140,7 +156,9 @@ class IssueList extends React.Component {
         this.loadData();
     }
 
+    // fetch the issues list by calling api and setting the state which will display the list
     async loadData() {
+        // query to fetch issue list
         const query = `query {
             issueList {
                 id title status owner
@@ -163,6 +181,7 @@ class IssueList extends React.Component {
                 <hr />
                 <IssueTable issues={this.state.issues} />
                 <hr />
+                {/* bind IssueList as this to createIssue method */}
                 <IssueAdd createIssue={this.createIssue.bind(this)} />
             </React.Fragment>
         )
