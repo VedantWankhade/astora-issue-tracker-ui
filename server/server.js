@@ -1,7 +1,7 @@
 const express = require('express');
 const {ApolloServer} = require('apollo-server-express')
 const fs = require('fs')
-const {GraphQLScalarType} = require('graphql')
+const {GraphQLScalarType, Kind} = require('graphql')
 
 let aboutMessage = "Astora issue tracker API v1.0";
 
@@ -24,26 +24,34 @@ const GraphQLDate = new GraphQLScalarType({
 
     serialize(value) {
         return value.toISOString();
-    }
+    },
+    parseLiteral(ast) {
+        return (ast.kind === Kind.STRING) ? new Date(ast.value) : undefined;
+    },
+    parseValue(value) {
+        return new Date(value);
+    },
 })
 
 const apiResolvers = {
     Query: {
         about: () => aboutMessage,
-        issueList
+        issueList: () => issuesDB
     },
     Mutation: {
         setAboutMessage: (_, { message }) => {
             return aboutMessage = message;
         },
+        issueAdd: (_, { issue }) => {
+            issue.created = new Date();
+            issue.id = issuesDB.length + 1;
+            if (issue.status === undefined) issue.status = 'New';
+            issuesDB.push(issue);
+            return issue;
+        }
     },
     GraphQLDate
 };
-
-function issueList() {
-
-    return issuesDB;
-}
 
 const server = new ApolloServer({
     typeDefs: fs.readFileSync('server/schema.graphql', 'utf-8'),
