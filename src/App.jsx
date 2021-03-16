@@ -1,5 +1,12 @@
+/* eslint "react/react-in-jsx-scope": "off" */
+/* globals React ReactDOM */
+/* eslint "react/jsx-no-undef": "off" */
+/* eslint "no-alert": "off" */
+
+/* globals React ReactDOM PropTypes */
+
 // regex of pattern ISOString
-const dateRegex = new RegExp("^\\d\\d\\d\\d-\\d\\d-\\d\\d");
+const dateRegex = new RegExp('^\\d\\d\\d\\d-\\d\\d-\\d\\d');
 
 // function that will be passed to JSON.parse, will convert each string date into Date object
 function jsonDateReviver(key, value) {
@@ -16,8 +23,8 @@ function jsonDateReviver(key, value) {
 async function graphQLFetch(query, variables = {}) {
   try {
     const response = await fetch(window.ENV.UI_API_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query, variables }),
     });
     const body = await response.text();
@@ -26,8 +33,8 @@ async function graphQLFetch(query, variables = {}) {
     // if errors are encountered show them as alert
     if (result.errors) {
       const error = result.errors[0];
-      if (error.extensions.code === "BAD_USER_INPUT") {
-        const details = error.extensions.exception.errors.join("\n");
+      if (error.extensions.code === 'BAD_USER_INPUT') {
+        const details = error.extensions.exception.errors.join('\n');
         alert(`${error.message}:\n ${details}`);
       } else {
         alert(`${error.extensions.code}: ${error.message}`);
@@ -61,7 +68,7 @@ function IssueRow(props) {
       <td>{issue.title}</td>
       <td>{issue.created.toDateString()}</td>
       {/* if due date is present then convert to string else return empty string */}
-      <td>{issue.due ? issue.due.toDateString() : ""}</td>
+      <td>{issue.due ? issue.due.toDateString() : ''}</td>
       <td>{issue.effort}</td>
     </tr>
   );
@@ -120,11 +127,15 @@ class IssueAdd extends React.Component {
       <form onSubmit={this.handleSubmit}>
         <input type="text" id="owner" name="owner" placeholder="Owner" />
         <input type="text" id="title" name="title" placeholder="Title" />
-        <button>Add</button>
+        <button type="submit">Add</button>
       </form>
     );
   }
 }
+
+IssueAdd.propTypes = {
+  createIssue: PropTypes.func.isRequired,
+};
 
 class IssueList extends React.Component {
   constructor() {
@@ -182,4 +193,4 @@ class IssueList extends React.Component {
   }
 }
 
-ReactDOM.render(<IssueList />, document.getElementById("contents"));
+ReactDOM.render(<IssueList />, document.getElementById('contents'));

@@ -1,21 +1,21 @@
-require("dotenv").config();
-const express = require("express");
-const proxy = require("http-proxy-middleware");
+require('dotenv').config();
+const express = require('express');
+const proxy = require('http-proxy-middleware');
 
 const apiProxyTarget = process.env.API_PROXY_TARGET;
 
 const UI_API_ENDPOINT =
-  process.env.UI_API_ENDPOINT || "http://localhost:3000/api";
+  process.env.UI_API_ENDPOINT || 'http://localhost:3000/api';
 const env = { UI_API_ENDPOINT };
 
 const app = express();
-app.use("/", express.static("public"));
+app.use('/', express.static('public'));
 
 if (apiProxyTarget) {
-  app.use("/api", proxy({ target: apiProxyTarget }));
+  app.use('/api', proxy({ target: apiProxyTarget }));
 }
 
-app.get("/env.js", function (req, res) {
+app.get('/env.js', function (req, res) {
   res.send(`window.ENV = ${JSON.stringify(env)}`);
 });
 
