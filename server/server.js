@@ -1,8 +1,21 @@
 // fs to read from files
 const fs = require('fs')
 const express = require('express')
+const { MongoClient } = require('mongodb');
 const {GraphQLScalarType, Kind} = require('graphql')
 const {ApolloServer, UserInputError} = require('apollo-server-express')
+
+// local database server url
+const DB_URL = "mongodb://localhost/astora-db";
+let db;
+
+async function connectToDB() {
+
+    const dbClient = await new MongoClient(DB_URL, {useNewUrlParser: true});
+    await dbClient.connect();
+    console.log("Connected to database server at ", DB_URL);
+    db = dbClient.db();
+}
 
 let aboutMessage = "Astora issue tracker API v1.0";
 
@@ -53,7 +66,7 @@ const apiResolvers = {
     Query: {
         about: () => aboutMessage,
         // returns the list of issues as a graphQL type [Issue]
-        issueList: () => issuesDB
+        issueList: async () => await db.collection('issues').find({}).toArray()
     },
     Mutation: {
         setAboutMessage: (_, { message }) => {
@@ -89,7 +102,14 @@ server.applyMiddleware({app, path: '/api'});
 
 app.use('/', middleware);
 
-app.listen(3000, function() {
+(async function() {
+    try {
+        await connectToDB();
+        app.listen(3000, function() {
 
-    console.log('App started at port http://localhost:3000');
-})
+            console.log('App started at port http://localhost:3000');
+        })
+    } catch (err) {
+        console.log(err);
+    }
+})();
