@@ -7,7 +7,12 @@ function jsonDateReviver(key, value) {
     return value;
 }
 
-// wrapper over api fetch, with error handling
+/**
+ * Wrapper over api fetch, with error handling
+ * @param query Api fetch query :string
+ * @param variables graphQL variable
+ * @returns {Promise<*>}
+ */
 async function graphQLFetch(query, variables = {}) {
     try {
         const response = await fetch('/api', {
@@ -36,6 +41,9 @@ async function graphQLFetch(query, variables = {}) {
     }
 }
 
+/**
+ * IssueFilter component shows options to filter issues
+ */
 class IssueFilter extends React.Component {
 
     render() {
