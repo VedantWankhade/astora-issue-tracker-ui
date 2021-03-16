@@ -15,7 +15,7 @@ function jsonDateReviver(key, value) {
  */
 async function graphQLFetch(query, variables = {}) {
   try {
-    const response = await fetch("/api", {
+    const response = await fetch("http://localhost:3000/api", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query, variables }),
@@ -35,7 +35,7 @@ async function graphQLFetch(query, variables = {}) {
     }
     return result.data;
   } catch (e) {
-    // if exception is found, then it must be server error
+    // if exception is found, then it must be api error
     alert(`Error in sending data to server: ${e.message}`);
   }
 }

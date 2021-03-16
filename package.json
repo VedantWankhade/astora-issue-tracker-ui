@@ -4,8 +4,7 @@
   "description": "UI for Astora issue tracker.",
   "main": "index.js",
   "scripts": {
-    "compile_run": "npm run compile && npm start",
-    "start": "nodemon -w server -e js, graphql server/server.js",
+    "start": "nodemon -w ./server.js ./server.js",
     "compile": "npx babel src --out-dir public",
     "watch": "npx babel src --out-dir public --watch --verbose",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -21,10 +20,7 @@
   "author": "VedantWankhade",
   "license": "GPL-3.0",
   "dependencies": {
-    "apollo-server-express": "^2.21.1",
     "express": "^4.17.1",
-    "graphql": "^0.13.2",
-    "mongodb": "^3.6.4",
     "nodemon": "^2.0.7"
   },
   "devDependencies": {
