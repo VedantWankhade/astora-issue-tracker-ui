@@ -1,10 +1,11 @@
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-th, td {
-    border: 1px solid black;
-    padding: 4px;
+th,
+td {
+  border: 1px solid black;
+  padding: 4px;
 }

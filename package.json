@@ -31,7 +31,8 @@
     "@babel/cli": "^7.13.0",
     "@babel/core": "^7.13.8",
     "@babel/preset-env": "^7.13.9",
-    "@babel/preset-react": "^7.12.13"
+    "@babel/preset-react": "^7.12.13",
+    "prettier": "2.2.1"
   },
   "bugs": {
     "url": "https://github.com/VedantWankhade/astora-issue-tracker-ui/issues"
