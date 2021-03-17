@@ -1,5 +1,6 @@
-/* globals React */
 /* eslint "react/prefer-stateless-function": "off" */
+
+import React from 'react';
 
 /**
  * IssueFilter component shows options to filter issues

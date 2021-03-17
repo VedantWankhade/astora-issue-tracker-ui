@@ -2,6 +2,7 @@ node_modules/
 .idea
 ignore/
 .env
+public/vendor.bundle.js
 public/app.bundle.js
 public/App.js
 public/graphQLFetch.js
