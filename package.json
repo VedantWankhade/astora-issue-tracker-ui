@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon -w ./server.js -w .env ./server.js",
-    "compile": "npx babel src --out-dir public",
-    "watch": "npx babel src --out-dir public --watch --verbose",
+    "compile": "npx webpack --mode production",
+    "watch": "npx webpack --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -30,6 +30,7 @@
     "@babel/core": "^7.13.8",
     "@babel/preset-env": "^7.13.9",
     "@babel/preset-react": "^7.12.13",
+    "babel-loader": "^8.2.2",
     "eslint": "^5.16.0",
     "eslint-config-airbnb": "^17.1.1",
     "eslint-plugin-import": "^2.22.1",
