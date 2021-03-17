@@ -1,4 +1,5 @@
 import React from 'react';
+import { HashRouter } from 'react-router-dom';
 import Contents from './Contents.jsx';
 
 function NavBar() {
@@ -17,7 +18,9 @@ export default function Page() {
   return (
     <div>
       <NavBar />
-      <Contents />
+      <HashRouter>
+        <Contents />
+      </HashRouter>
     </div>
   );
 }

@@ -11,6 +11,9 @@ function IssueRow({ issue }) {
       {/* if due date is present then convert to string else return empty string */}
       <td>{issue.due ? issue.due.toDateString() : ''}</td>
       <td>{issue.effort}</td>
+      <td>
+        <a href={`/#/edit/${issue.id}`}>Edit</a>
+      </td>
     </tr>
   );
 }
@@ -32,6 +35,7 @@ export default function IssueTable({ issues }) {
           <th>Created</th>
           <th>Due</th>
           <th>Effort</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
