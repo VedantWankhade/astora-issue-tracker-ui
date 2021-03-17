@@ -4,8 +4,11 @@
   "description": "UI for Astora issue tracker.",
   "main": "index.js",
   "scripts": {
+    "#start": "UI server. HMR is enables in dev mode.",
     "start": "nodemon -w ./server.js -w .env ./server.js",
+    "#compile": "Generates JS bundles for production. Use with start.",
     "compile": "npx webpack --mode production",
+    "#watch": "Compile, and recompile on any changes.",
     "watch": "npx webpack --watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -43,7 +46,9 @@
     "eslint-plugin-react": "^7.22.0",
     "prettier": "2.2.1",
     "webpack": "^4.46.0",
-    "webpack-cli": "^3.3.12"
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-middleware": "^3.7.3",
+    "webpack-hot-middleware": "^2.25.0"
   },
   "bugs": {
     "url": "https://github.com/VedantWankhade/astora-issue-tracker-ui/issues"
