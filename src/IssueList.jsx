@@ -29,17 +29,35 @@ export default class IssueList extends React.Component {
     this.loadData();
   }
 
+  componentDidUpdate(prevProps) {
+    const {
+      location: { search: prevSearch },
+    } = prevProps;
+    const {
+      location: { search },
+    } = this.props;
+    if (prevSearch !== search) {
+      this.loadData();
+    }
+  }
+
   // fetch the issues list by calling api and setting the state which will display the list
   async loadData() {
+    const {
+      location: { search },
+    } = this.props;
+    const params = new URLSearchParams(search);
+    const vars = {};
+    if (params.get('status')) vars.status = params.get('status');
     // query to fetch issue list
-    const query = `query {
-            issueList {
+    const query = `query issueList($status: StatusType) {
+            issueList(status: $status) {
                 id title status owner
                 created effort due
             }
         }`;
 
-    const data = await graphQLFetch(query);
+    const data = await graphQLFetch(query, vars);
     if (data) {
       this.setState({ issues: data.issueList });
     }
