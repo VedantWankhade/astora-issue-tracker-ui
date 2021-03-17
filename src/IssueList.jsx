@@ -1,7 +1,9 @@
 import React from 'react';
+import { Route } from 'react-router-dom';
 import IssueFilter from './IssueFilter.jsx';
 import IssueTable from './IssueTable.jsx';
 import IssueAdd from './IssueAdd.jsx';
+import IssueDetail from './IssueDetail.jsx';
 import graphQLFetch from './graphQLFetch.js';
 
 export default class IssueList extends React.Component {
@@ -64,6 +66,9 @@ export default class IssueList extends React.Component {
   }
 
   render() {
+    // const { issue } = this.state;
+    const { match } = this.props;
+
     return (
       <React.Fragment>
         <h1>Issue Tracker</h1>
@@ -73,6 +78,8 @@ export default class IssueList extends React.Component {
         <hr />
         {/* bind IssueList as this to createIssue method */}
         <IssueAdd createIssue={this.createIssue.bind(this)} />
+        <hr />
+        <Route path={`${match.path}/:id`} component={IssueDetail} />
       </React.Fragment>
     );
   }
