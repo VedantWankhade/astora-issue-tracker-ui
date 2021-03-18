@@ -12,21 +12,6 @@ export default class IssueList extends React.Component {
     this.state = { issues: [] };
   }
 
-  // add issue to the issuesDB by calling api and then reload the IssueList
-  async createIssue(issue) {
-    // query to add issue using graphQL variable
-    const query = `mutation issueAdd($issue: IssueInputs!) {
-                            issueAdd(issue: $issue) {
-                                id
-                            }
-                        }`;
-
-    const data = await graphQLFetch(query, { issue });
-    if (data) {
-      this.loadData();
-    }
-  }
-
   componentDidMount() {
     this.loadData();
   }
@@ -39,6 +24,21 @@ export default class IssueList extends React.Component {
       location: { search },
     } = this.props;
     if (prevSearch !== search) {
+      this.loadData();
+    }
+  }
+
+  // add issue to the issuesDB by calling api and then reload the IssueList
+  async createIssue(issue) {
+    // query to add issue using graphQL variable
+    const query = `mutation issueAdd($issue: IssueInputs!) {
+                            issueAdd(issue: $issue) {
+                                id
+                            }
+                        }`;
+
+    const data = await graphQLFetch(query, { issue });
+    if (data) {
       this.loadData();
     }
   }
