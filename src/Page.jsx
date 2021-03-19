@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter, NavLink } from 'react-router-dom';
+import { BrowserRouter, NavLink } from 'react-router-dom';
 import Contents from './Contents.jsx';
 
 function NavBar() {
@@ -19,12 +19,12 @@ function NavBar() {
 export default function Page() {
   return (
     <div>
-      <HashRouter>
+      <BrowserRouter>
         <NavBar />
-      </HashRouter>
-      <HashRouter>
+      </BrowserRouter>
+      <BrowserRouter>
         <Contents />
-      </HashRouter>
+      </BrowserRouter>
     </div>
   );
 }
