@@ -10,10 +10,19 @@ td {
   padding: 4px;
 }
 
-input.invalid {
-  border-color: red;
+.panel-title a {
+  display: block;
+  width: 100%;
+  cursor: pointer;
 }
 
-div.error {
-  color: red;
+table.table-hover tr {
+  cursor: pointer;
+}
+
+.footer {
+  position: fixed;
+  bottom: 5px;
+  width: 100%;
+  text-align: center;
 }

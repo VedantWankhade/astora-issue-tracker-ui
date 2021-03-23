@@ -1,17 +1,26 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
+import { Panel } from 'react-bootstrap';
 import IssueFilter from './IssueFilter.jsx';
 import IssueTable from './IssueTable.jsx';
-import IssueAdd from './IssueAdd.jsx';
 import IssueDetail from './IssueDetail.jsx';
 import graphQLFetch from './graphQLFetch.js';
+import Toast from './Toast.jsx';
 
 export default class IssueList extends React.Component {
   constructor() {
     super();
-    this.state = { issues: [] };
+    this.state = {
+      issues: [],
+      toastVisible: false,
+      toastMessage: '',
+      toastType: 'info',
+    };
     this.closeIssue = this.closeIssue.bind(this);
     this.deleteIssue = this.deleteIssue.bind(this);
+    this.showSuccess = this.showSuccess.bind(this);
+    this.showError = this.showError.bind(this);
+    this.dismissToast = this.dismissToast.bind(this);
   }
 
   componentDidMount() {
@@ -40,7 +49,7 @@ issueDelete(id: $id)
       history,
     } = this.props;
     const { id } = issues[index];
-    const data = await graphQLFetch(query, { id });
+    const data = await graphQLFetch(query, { id }, this.showError);
     if (data && data.issueDelete) {
       this.setState((prevState) => {
         const newList = [...prevState.issues];
@@ -48,11 +57,32 @@ issueDelete(id: $id)
           history.push({ pathname: '/issues', search });
         }
         newList.splice(index, 1);
+        this.showSuccess(`Deleted issue ${id} successfully`);
         return { issues: newList };
       });
     } else {
       this.loadData();
     }
+  }
+
+  showSuccess(message) {
+    this.setState({
+      toastVisible: true,
+      toastMessage: message,
+      toastType: 'success',
+    });
+  }
+
+  showError(message) {
+    this.setState({
+      toastVisible: true,
+      toastMessage: message,
+      toastType: 'danger',
+    });
+  }
+
+  dismissToast() {
+    this.setState({ toastVisible: false });
   }
 
   async closeIssue(index) {
@@ -64,7 +94,11 @@ issueDelete(id: $id)
             }`;
 
     const { issues } = this.state;
-    const data = await graphQLFetch(query, { id: issues[index].id });
+    const data = await graphQLFetch(
+      query,
+      { id: issues[index].id },
+      this.showError
+    );
     if (data) {
       this.setState((prevState) => {
         const newList = [...prevState.issues];
@@ -77,19 +111,20 @@ issueDelete(id: $id)
   }
 
   // add issue to the issuesDB by calling api and then reload the IssueList
-  async createIssue(issue) {
-    // query to add issue using graphQL variable
-    const query = `mutation issueAdd($issue: IssueInputs!) {
-                            issueAdd(issue: $issue) {
-                                id
-                            }
-                        }`;
+  // async createIssue(issue) {
+  //   // query to add issue using graphQL variable
+  //   const query = `mutation issueAdd($issue: IssueInputs!) {
+  //                           issueAdd(issue: $issue) {
+  //                               id
+  //                           }
+  //                       }`;
 
-    const data = await graphQLFetch(query, { issue });
-    if (data) {
-      this.loadData();
-    }
-  }
+  //   const data = await graphQLFetch(query, { issue }, this.showError);
+  //   if (data) {
+  //     this.loadData();
+  //     this.showSuccess('Created issue successfully');
+  //   }
+  // }
 
   // fetch the issues list by calling api and setting the state which will display the list
   async loadData() {
@@ -132,21 +167,36 @@ issueDelete(id: $id)
     // const { issue } = this.state;
     const { match } = this.props;
 
+    const { toastVisible, toastType, toastMessage } = this.state;
+
     return (
       <React.Fragment>
-        <h1>Issue Tracker</h1>
-        <IssueFilter />
-        <hr />
+        <Panel>
+          <Panel.Heading>
+            <Panel.Title toggle>Filter</Panel.Title>
+          </Panel.Heading>
+          <Panel.Body collapsible>
+            <IssueFilter />
+          </Panel.Body>
+        </Panel>
         <IssueTable
           issues={this.state.issues}
           closeIssue={this.closeIssue}
           deleteIssue={this.deleteIssue}
         />
-        <hr />
+
         {/* bind IssueList as this to createIssue method */}
-        <IssueAdd createIssue={this.createIssue.bind(this)} />
-        <hr />
+        {/* <IssueAdd createIssue={this.createIssue.bind(this)} /> */}
+
         <Route path={`${match.path}/:id`} component={IssueDetail} />
+
+        <Toast
+          showing={toastVisible}
+          onDismiss={this.dismissToast}
+          bsStyle={toastType}
+        >
+          {toastMessage}
+        </Toast>
       </React.Fragment>
     );
   }

@@ -2,6 +2,16 @@
 
 import React from 'react';
 import { withRouter } from 'react-router-dom';
+import {
+  ButtonToolbar,
+  Button,
+  FormGroup,
+  FormControl,
+  ControlLabel,
+  InputGroup,
+  Row,
+  Col,
+} from 'react-bootstrap';
 
 /**
  * IssueFilter component shows options to filter issues
@@ -18,13 +28,16 @@ class IssueFilter extends React.Component {
     };
     this.onChangeStatus = this.onChangeStatus.bind(this);
     this.applyFilter = this.applyFilter.bind(this);
+    this.showOriginalFilter = this.showOriginalFilter.bind(this);
     this.onChangeEffortMin = this.onChangeEffortMin.bind(this);
     this.onChangeEffortMax = this.onChangeEffortMax.bind(this);
   }
 
   componentDidUpdate(prevProps) {
     const prevSearch = prevProps.location.search;
-    const search = this.props.location.search;
+    const {
+      location: { search },
+    } = this.props;
     if (prevSearch !== search) {
       this.showOriginalFilter();
     }
@@ -49,7 +62,10 @@ class IssueFilter extends React.Component {
   }
 
   showOriginalFilter() {
-    const search = this.props.location.search;
+    // const prevSearch = prevProps.location.search;
+    const {
+      location: { search },
+    } = this.props;
     const params = new URLSearchParams(search);
     this.setState({
       status: params.get('status') || '',
@@ -61,7 +77,7 @@ class IssueFilter extends React.Component {
 
   applyFilter() {
     const { status, effortMax, effortMin } = this.state;
-    const history = this.props.history;
+    const { history } = this.props;
 
     const params = new URLSearchParams();
     if (status) params.set('status', status);
@@ -77,39 +93,62 @@ class IssueFilter extends React.Component {
     const { effortMin, effortMax } = this.state;
 
     return (
-      <div>
-        Status:{' '}
-        <select value={status} onChange={this.onChangeStatus}>
-          <option value="">(All)</option>
-          <option value="New">New</option>
-          <option value="Assigned">Assigned</option>
-          <option value="Fixed">Fixed</option>
-          <option value="Closed">Closed</option>
-        </select>{' '}
-        Effort Between:{' '}
-        <input
-          type="number"
-          size={5}
-          value={effortMin}
-          onChange={this.onChangeEffortMin}
-        />
-        <input
-          size={5}
-          type="number"
-          value={effortMax}
-          onChange={this.onChangeEffortMax}
-        />
-        <button type="button" onClick={this.applyFilter}>
-          Apply
-        </button>
-        <button
-          type="button"
-          onClick={this.showOriginalFilter}
-          disabled={!changed}
-        >
-          Reset
-        </button>
-      </div>
+      <Row>
+        <Col xs={6} sm={4} md={3} lg={2}>
+          <FormGroup>
+            <ControlLabel>Status:</ControlLabel>
+            <FormControl
+              componentClass="select"
+              value={status}
+              onChange={this.onChangeStatus}
+            >
+              <option value="All">(All)</option>
+              <option value="New">New</option>
+              <option value="Assigned">Assigned</option>
+              <option value="Closed">Closed</option>
+              <option value="Solved">Solved</option>
+            </FormControl>
+          </FormGroup>
+        </Col>
+        <Col xs={6} sm={4} md={3} lg={2}>
+          <FormGroup>
+            <ControlLabel>Effort between:</ControlLabel>
+            <InputGroup>
+              <FormControl
+                value={effortMin}
+                onChange={this.onChangeEffortMin}
+              />
+              <InputGroup.Addon>-</InputGroup.Addon>
+              <FormControl
+                value={effortMax}
+                onChange={this.onChangeEffortMax}
+              />
+            </InputGroup>
+          </FormGroup>
+        </Col>
+        <Col xs={6} sm={4} md={3} lg={2}>
+          <FormGroup>
+            <ControlLabel>&nbsp;</ControlLabel>
+
+            <ButtonToolbar>
+              <Button
+                bsStyle="primary"
+                type="button"
+                onClick={this.applyFilter}
+              >
+                Apply
+              </Button>
+              <Button
+                type="button"
+                onClick={this.showOriginalFilter}
+                disabled={!changed}
+              >
+                Reset
+              </Button>
+            </ButtonToolbar>
+          </FormGroup>
+        </Col>
+      </Row>
     );
   }
 }

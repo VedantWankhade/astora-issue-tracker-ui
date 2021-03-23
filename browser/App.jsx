@@ -2,9 +2,14 @@ import 'babel-polyfill';
 import 'whatwg-fetch';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Page from './Page.jsx';
+import { BrowserRouter } from 'react-router-dom';
+import Page from '../src/Page.jsx';
 
-const element = <Page />;
+const element = (
+  <BrowserRouter>
+    <Page />
+  </BrowserRouter>
+);
 
 ReactDOM.render(element, document.getElementById('contents'));
 

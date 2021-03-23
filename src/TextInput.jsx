@@ -21,9 +21,9 @@ export default class TextInput extends React.Component {
   }
 
   onBlur(e) {
-    const { onChnage } = this.state;
+    const { onChange } = this.props;
     const { value } = this.state;
-    this.onChange(e, unformat(value));
+    onChange(e, unformat(value));
   }
 
   render() {

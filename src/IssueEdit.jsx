@@ -2,6 +2,23 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import { Link } from 'react-router-dom';
+
+import { LinkContainer } from 'react-router-bootstrap';
+
+import Toast from './Toast.jsx';
+
+import {
+  Col,
+  Panel,
+  Form,
+  FormGroup,
+  FormControl,
+  ControlLabel,
+  ButtonToolbar,
+  Button,
+  Alert,
+} from 'react-bootstrap';
+
 import NumInput from './NumInput.jsx';
 import DateInput from './DateInput.jsx';
 import TextInput from './TextInput.jsx';
@@ -13,10 +30,18 @@ export default class IssueEdit extends React.Component {
     this.state = {
       issue: {},
       invalidFields: {},
+      showingValidation: false,
+      toastVisible: false,
+      toastMessage: ' ',
+      toastType: 'success',
     };
     this.onChange = this.onChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.onValidityChange = this.onValidityChange.bind(this);
+    this.dismissValidation = this.dismissValidation.bind(this);
+    this.showSuccess = this.showSuccess.bind(this);
+    this.showError = this.showError.bind(this);
+    this.dismissToast = this.dismissToast.bind(this);
   }
 
   componentDidMount() {
@@ -58,6 +83,7 @@ export default class IssueEdit extends React.Component {
 
   async handleSubmit(e) {
     e.preventDefault();
+    this.showValidation();
     const { issue, invalidFields } = this.state;
 
     if (Object.keys(invalidFields).length !== 0) return;
@@ -76,11 +102,19 @@ export default class IssueEdit extends React.Component {
               }`;
 
     const { id, created, ...changes } = issue;
-    const data = await graphQLFetch(query, { changes, id });
+    const data = await graphQLFetch(query, { changes, id }, this.showError);
     if (data) {
       this.setState({ issue: data.issueUpdate });
-      alert('Updated issue successfully');
+      this.showSuccess('Updated issue successfully');
     }
+  }
+
+  showValidation() {
+    this.setState({ showingValidation: true });
+  }
+
+  dismissValidation() {
+    this.setState({ showingValidation: false });
   }
 
   async loadData() {
@@ -97,7 +131,7 @@ export default class IssueEdit extends React.Component {
       },
     } = this.props;
 
-    const data = await graphQLFetch(query, { id });
+    const data = await graphQLFetch(query, { id }, this.showError);
     // if (data) {
     //   const { issue } = data;
     //   issue.due = issue.due ? issue.due.toDateString() : '';
@@ -109,6 +143,26 @@ export default class IssueEdit extends React.Component {
     //   this.setState({ issue: {}, invalidFields: {} });
     // }
     this.setState({ issue: data ? data.issue : {}, invalidFields: {} });
+  }
+
+  showSuccess(message) {
+    this.setState({
+      toastVisible: true,
+      toastMessage: message,
+      toastType: 'success',
+    });
+  }
+
+  showError(message) {
+    this.setState({
+      toastVisible: true,
+      toastMessage: message,
+      toastType: 'danger',
+    });
+  }
+
+  dismissToast() {
+    this.setState({ toastVisible: false });
   }
 
   render() {
@@ -127,14 +181,16 @@ export default class IssueEdit extends React.Component {
       return null;
     }
 
-    const { invalidFields } = this.state;
+    const { toastVisible, toastMessage, toastType } = this.state;
+
+    const { invalidFields, showingValidation } = this.state;
     let validationMessage;
 
-    if (Object.keys(invalidFields).length !== 0) {
+    if (Object.keys(invalidFields).length !== 0 && showingValidation) {
       validationMessage = (
-        <div className="error">
+        <Alert bsStyle="danger" onDismiss={this.dismissValidation}>
           Please correct invalid fields before submitting
-        </div>
+        </Alert>
       );
     }
 
@@ -149,98 +205,239 @@ export default class IssueEdit extends React.Component {
     } = this.state;
 
     return (
-      <form onSubmit={this.handleSubmit}>
-        <h3>{`Editing issue: ${id}`}</h3>
-        <table>
-          <tbody>
-            <tr>
-              <td>Created:</td>
-              <td>{created.toDateString()}</td>
-            </tr>
-            <tr>
-              <td>Status:</td>
-              <td>
-                <select name="status" value={status} onChange={this.onChange}>
+      // <form onSubmit={this.handleSubmit}>
+      //   <h3>{`Editing issue: ${id}`}</h3>
+      //   <table>
+      //     <tbody>
+      //       <tr>
+      //         <td>Created:</td>
+      //         <td>{created.toDateString()}</td>
+      //       </tr>
+      //       <tr>
+      //         <td>Status:</td>
+      //         <td>
+      //           <select name="status" value={status} onChange={this.onChange}>
+      //             <option value="New">New</option>
+      //             <option value="Assigned">Assigned</option>
+      //             <option value="Fiexd">Fixed</option>
+      //             <option value="Closed">Closed</option>
+      //           </select>
+      //         </td>
+      //       </tr>
+      //       <tr>
+      //         <td>Owner:</td>
+      //         <td>
+      //           <TextInput
+      //             key={id}
+      //             name="owner"
+      //             value={owner}
+      //             onChange={this.onChange}
+      //           />
+      //         </td>
+      //       </tr>
+      //       <tr>
+      //         <td>Effort:</td>
+      //         <td>
+      //           <NumInput
+      //             key={id}
+      //             name="effort"
+      //             value={effort}
+      //             onChange={this.onChange}
+      //           />
+      //         </td>
+      //       </tr>
+      //       <tr>
+      //         <td>Due:</td>
+      //         <td>
+      //           <DateInput
+      //             name="due"
+      //             value={due}
+      //             onChange={this.onChange}
+      //             onValidityChange={this.onValidityChange}
+      //             key={id}
+      //           />
+      //         </td>
+      //       </tr>
+      //       <tr>
+      //         <td>Title:</td>
+      //         <td>
+      //           <TextInput
+      //             key={id}
+      //             size={50}
+      //             name="title"
+      //             value={title}
+      //             onChange={this.onChange}
+      //           />
+      //         </td>
+      //       </tr>
+      //       <tr>
+      //         <td>Description:</td>
+      //         <td>
+      //           <TextInput
+      //             tag="textarea"
+      //             key={id}
+      //             rows={8}
+      //             cols={50}
+      //             name="description"
+      //             value={description}
+      //             onChange={this.onChange}
+      //           />
+      //         </td>
+      //       </tr>
+      //       <tr>
+      //         <td />
+      //         <td>
+      //           <button type="submit">Submit</button>
+      //         </td>
+      //       </tr>
+      //     </tbody>
+      //   </table>
+      //   {validationMessage}
+      //   <Link to={`/edit/${id - 1}`}>Prev</Link>
+      //   {' | '}
+      //   <Link to={`/edit/${id + 1}`}>Next</Link>
+      // </form>
+
+      <Panel>
+        <Panel.Heading>
+          <Panel.Title>{`Editing issue: ${id}`}</Panel.Title>
+        </Panel.Heading>
+        <Panel.Body>
+          <Form horizontal onSubmit={this.handleSubmit}>
+            <FormGroup>
+              <Col componentClass={ControlLabel} sm={3}>
+                Created
+              </Col>
+              <Col sm={9}>
+                <FormControl.Static>
+                  {created.toDateString()}
+                </FormControl.Static>
+              </Col>
+            </FormGroup>
+            <FormGroup>
+              <Col componentClass={ControlLabel} sm={3}>
+                Status
+              </Col>
+              <Col sm={9}>
+                <FormControl
+                  componentClass="select"
+                  name="status"
+                  value={status}
+                  onChange={this.onChange}
+                >
                   <option value="New">New</option>
                   <option value="Assigned">Assigned</option>
-                  <option value="Fiexd">Fixed</option>
+                  <option value="Fixed">Fixed</option>
                   <option value="Closed">Closed</option>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>Owner:</td>
-              <td>
-                <TextInput
-                  key={id}
+                </FormControl>
+              </Col>
+            </FormGroup>
+            <FormGroup>
+              <Col componentClass={ControlLabel} sm={3}>
+                Owner
+              </Col>
+              <Col sm={9}>
+                <FormControl
+                  componentClass={TextInput}
                   name="owner"
                   value={owner}
                   onChange={this.onChange}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>Effort:</td>
-              <td>
-                <NumInput
                   key={id}
+                />
+              </Col>
+            </FormGroup>
+            <FormGroup>
+              <Col componentClass={ControlLabel} sm={3}>
+                Effort
+              </Col>
+              <Col sm={9}>
+                <FormControl
+                  componentClass={NumInput}
                   name="effort"
                   value={effort}
                   onChange={this.onChange}
+                  key={id}
                 />
-              </td>
-            </tr>
-            <tr>
-              <td>Due:</td>
-              <td>
-                <DateInput
+              </Col>
+            </FormGroup>
+            <FormGroup validationState={invalidFields.due ? 'error' : null}>
+              <Col componentClass={ControlLabel} sm={3}>
+                Due
+              </Col>
+              <Col sm={9}>
+                <FormControl
+                  componentClass={DateInput}
+                  onValidityChange={this.onValidityChange}
                   name="due"
                   value={due}
                   onChange={this.onChange}
-                  onValidityChange={this.onValidityChange}
                   key={id}
                 />
-              </td>
-            </tr>
-            <tr>
-              <td>Title:</td>
-              <td>
-                <TextInput
-                  key={id}
+                <FormControl.Feedback />
+              </Col>
+            </FormGroup>
+            <FormGroup>
+              <Col componentClass={ControlLabel} sm={3}>
+                Title
+              </Col>
+              <Col sm={9}>
+                <FormControl
+                  componentClass={TextInput}
                   size={50}
                   name="title"
                   value={title}
                   onChange={this.onChange}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>Description:</td>
-              <td>
-                <TextInput
-                  tag="textarea"
                   key={id}
-                  rows={8}
+                />
+              </Col>
+            </FormGroup>
+            <FormGroup>
+              <Col componentClass={ControlLabel} sm={3}>
+                Description
+              </Col>
+              <Col sm={9}>
+                <FormControl
+                  componentClass={TextInput}
+                  tag="textarea"
+                  rows={4}
                   cols={50}
                   name="description"
                   value={description}
                   onChange={this.onChange}
+                  key={id}
                 />
-              </td>
-            </tr>
-            <tr>
-              <td />
-              <td>
-                <button type="submit">Submit</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        {validationMessage}
-        <Link to={`/edit/${id - 1}`}>Prev</Link>
-        {' | '}
-        <Link to={`/edit/${id + 1}`}>Next</Link>
-      </form>
+              </Col>
+            </FormGroup>
+            <FormGroup>
+              <Col smOffset={3} sm={6}>
+                <ButtonToolbar>
+                  <Button bsStyle="primary" type="submit">
+                    Submit
+                  </Button>
+                  <LinkContainer to="/issues">
+                    <Button bsStyle="link">Back</Button>
+                  </LinkContainer>
+                </ButtonToolbar>
+              </Col>
+            </FormGroup>
+          </Form>
+          <FormGroup>
+            <Col smOffset={3}>{validationMessage}</Col>
+          </FormGroup>
+        </Panel.Body>
+        <Panel.Footer>
+          <Link to={`/edit/${id - 1}`}>Prev</Link>
+          {' | '}
+          <Link to={`/edit/${id + 1}`}>Next</Link>
+        </Panel.Footer>
+        <Toast
+          showing={toastVisible}
+          onDismiss={this.dismissToast}
+          bsStyle={toastType}
+        >
+          {toastMessage}
+        </Toast>
+      </Panel>
     );
   }
 }
