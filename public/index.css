@@ -26,3 +26,7 @@ table.table-hover tr {
   width: 100%;
   text-align: center;
 }
+
+a.active {
+  background-color: #d8d8f5;
+}
